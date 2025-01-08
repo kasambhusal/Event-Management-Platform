@@ -3,13 +3,21 @@ import { motion } from "framer-motion";
 import { LogoutOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import Link from "next/link";
+import { useUser } from "@/app/context/UserContext";
+import { useRouter } from "next/navigation";
 
 function DashboardNav() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-
+  const { user, setUser } = useUser();
+  const router = useRouter();
   const handleLogout = (): void => {
-    console.log("Logged out");
+    setUser({
+      id: null,
+      name: null,
+      email: null,
+    });
     setShowLogoutConfirm(false);
+    router.push("/");
   };
 
   const toggleLogoutConfirm = () => {
@@ -31,7 +39,9 @@ function DashboardNav() {
           </Link>
 
           {/* Welcome Message */}
-          <h1 className="text-lg font-medium text-white">Hi, Kasam</h1>
+          <h1 className="text-lg font-medium text-white">
+            Hi, {user?.name || "Unknown User"}
+          </h1>
 
           {/* Logout Icon with Dropdown */}
           <div className="relative">

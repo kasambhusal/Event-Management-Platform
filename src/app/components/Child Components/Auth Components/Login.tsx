@@ -1,21 +1,102 @@
 "use client";
-import React from "react";
-import { Button, Checkbox, Form, Input } from "antd";
+import React, { useEffect } from "react";
+import { Button, Checkbox, Form, Input, message } from "antd";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/solid";
-import { useRouter } from "next/navigation"; // Correct import for navigation
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { loginUser } from "@/lib/actions/authActions";
+import { useUser } from "@/app/context/UserContext";
+
+interface LoginFormValues {
+  email: string;
+  password: string;
+  remember: boolean;
+}
+
+// Simple XOR cipher for basic obfuscation
+const encrypt = (text: string): string => {
+  const key = "mySecretKey"; // You should use a more secure key in production
+  return text
+    .split("")
+    .map((char, index) =>
+      String.fromCharCode(
+        char.charCodeAt(0) ^ key.charCodeAt(index % key.length)
+      )
+    )
+    .join("");
+};
+
+const decrypt = (text: string): string => {
+  // XOR is symmetric, so we can use the same function for decryption
+  return encrypt(text);
+};
 
 export default function Login() {
-  const router = useRouter(); // useRouter for navigation
+  const router = useRouter();
+  const [form] = Form.useForm<LoginFormValues>();
+  const { user, setUser } = useUser();
 
-  const onFinish = (values: string): void => {
-    console.log("Success:", values);
-    router.push("/dashboard/events"); // Use router.push to navigate
-  };
+  useEffect(() => {
+    const rememberedUser = localStorage.getItem("rememberedUser");
+    if (rememberedUser) {
+      const { email, encryptedPassword } = JSON.parse(rememberedUser);
+      console.log("Retrieved from localStorage:", { email, encryptedPassword }); // Log here
+      if (encryptedPassword) {
+        const password = decrypt(encryptedPassword);
+        form.setFieldsValue({ email, password, remember: true });
+      } else {
+        console.error("Encrypted password is missing!");
+      }
+    }
+  }, [form]);
+  useEffect(() => {
+    if (user.email && user.id && user.name) {
+      router.push("/dashboard/events");
+    }
+  }, []);
+  const onFinish = async (values: LoginFormValues) => {
+    if (!values.password) {
+      console.error("Password is missing");
+      message.error("Password is required");
+      return;
+    }
 
-  const onFinishFailed = (errorInfo: any): void => {
-    console.log("Failed:", errorInfo);
+    try {
+      const result = await loginUser({
+        email: values.email,
+        password: values.password,
+      });
+
+      if (result.success) {
+        setUser({
+          id: result?.data?.id || null,
+          name: result?.data?.name || null,
+          email: result?.data?.email || null,
+        });
+        message.success(result.message);
+        if (values.remember) {
+          const encryptedPassword = encrypt(values.password);
+          console.log("Saving to localStorage:", {
+            email: values.email,
+            encryptedPassword,
+          }); // Log here
+          localStorage.setItem(
+            "rememberedUser",
+            JSON.stringify({ email: values.email, encryptedPassword })
+          );
+        } else {
+          localStorage.removeItem("rememberedUser");
+        }
+        router.push("/dashboard/events");
+      } else {
+        message.error(result.message || "Login failed");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      message.error("An unexpected error occurred. Please try again.");
+    }
   };
 
   return (
@@ -26,14 +107,14 @@ export default function Login() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <Form
+        <Form<LoginFormValues>
+          form={form}
           className="bg-white shadow-2xl rounded-lg px-8 pt-6 pb-8 mb-4"
-          name="basic"
+          name="login"
           initialValues={{
             remember: true,
           }}
           onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
           autoComplete="off"
           layout="vertical"
         >
@@ -48,9 +129,8 @@ export default function Login() {
               damping: 20,
             }}
           >
-            <Link href="/">
-              <span className="text-3xl font-bold text-indigo-600">LOGO</span>
-              <span className="text-xl text-gray-600 ml-2">Kya huwa re</span>
+            <Link href="/" className="flex justify-center">
+              <Image src="/logo.jpg" alt="logo" width={150} height={80} />
             </Link>
           </motion.div>
 
@@ -95,7 +175,7 @@ export default function Login() {
                 htmlType="submit"
                 className="w-full bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center"
               >
-                LogIn
+                Log In
               </Button>
             </motion.div>
           </Form.Item>

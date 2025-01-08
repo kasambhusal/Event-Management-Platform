@@ -104,7 +104,7 @@ const EventCard: React.FC<EventCardProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center z-50"
+            className="fixed inset-0 bg-gray-600 bg-opacity-20 overflow-y-auto h-full w-full flex justify-center items-center z-50"
           >
             <motion.div
               initial={{ scale: 0.9 }}

@@ -1,22 +1,45 @@
 "use client";
-import { Button, Form, Input, Radio } from "antd";
+
+import { Button, Form, Input, message } from "antd";
 import { motion } from "framer-motion";
 import {
   UserIcon,
   EnvelopeIcon,
   LockClosedIcon,
-  MapPinIcon,
 } from "@heroicons/react/24/solid";
+import Image from "next/image";
+import Link from "next/link";
+import { registerUser } from "@/lib/actions/authActions";
 
-const onFinish = (values: any): void => {
-  console.log("Success:", values);
-};
-
-const onFinishFailed = (errorInfo: any): void => {
-  console.log("Failed:", errorInfo);
-};
+interface FormValues {
+  username: string;
+  email: string;
+  password: string;
+}
 
 export default function SignUp() {
+  const [form] = Form.useForm();
+
+  const onFinish = async (values: FormValues) => {
+    try {
+      const result = await registerUser({
+        name: values.username,
+        email: values.email,
+        password: values.password,
+      });
+
+      if (result.success) {
+        message.success(result.message);
+        form.resetFields();
+      } else {
+        message.error(result.message);
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      message.error("An unexpected error occurred. Please try again.");
+    }
+  };
+
   return (
     <div className="flex justify-center items-center w-screen min-h-screen bg-gradient-to-br from-purple-400 to-indigo-600 py-12">
       <motion.div
@@ -26,10 +49,10 @@ export default function SignUp() {
         className="w-full max-w-md"
       >
         <Form
+          form={form}
           className="bg-white shadow-2xl rounded-lg px-8 pt-6 pb-8 mb-4"
           name="signup"
           onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
           autoComplete="off"
           layout="vertical"
         >
@@ -44,8 +67,9 @@ export default function SignUp() {
               damping: 20,
             }}
           >
-            <span className="text-3xl font-bold text-indigo-600">LOGO</span>
-            <span className="text-xl text-gray-600 ml-2">Kya huwa re</span>
+            <Link href="/" className="flex justify-center">
+              <Image src="/logo.jpg" alt="logo" width={150} height={80} />
+            </Link>
           </motion.div>
 
           <Form.Item
@@ -53,11 +77,7 @@ export default function SignUp() {
             rules={[{ required: true, message: "Please input your username!" }]}
           >
             <Input
-              prefix={
-                <span>
-                  <UserIcon className="h-5 w-5 text-gray-400" />
-                </span>
-              } // Wrap in span
+              prefix={<UserIcon className="h-5 w-5 text-gray-400" />}
               placeholder="Username"
               className="rounded-md"
             />
@@ -71,11 +91,7 @@ export default function SignUp() {
             ]}
           >
             <Input
-              prefix={
-                <span>
-                  <EnvelopeIcon className="h-5 w-5 text-gray-400" />
-                </span>
-              } // Wrap in span
+              prefix={<EnvelopeIcon className="h-5 w-5 text-gray-400" />}
               placeholder="Email"
               className="rounded-md"
             />
@@ -86,11 +102,7 @@ export default function SignUp() {
             rules={[{ required: true, message: "Please input your password!" }]}
           >
             <Input.Password
-              prefix={
-                <span>
-                  <LockClosedIcon className="h-5 w-5 text-gray-400" />
-                </span>
-              } // Wrap in span
+              prefix={<LockClosedIcon className="h-5 w-5 text-gray-400" />}
               placeholder="Password"
               className="rounded-md"
             />
@@ -114,11 +126,7 @@ export default function SignUp() {
             ]}
           >
             <Input.Password
-              prefix={
-                <span>
-                  <LockClosedIcon className="h-5 w-5 text-gray-400" />
-                </span>
-              } // Wrap in span
+              prefix={<LockClosedIcon className="h-5 w-5 text-gray-400" />}
               placeholder="Confirm Password"
               className="rounded-md"
             />
@@ -138,15 +146,16 @@ export default function SignUp() {
 
           <div className="text-center mt-4">
             <span className="text-gray-600">Already have an account? </span>
-            <a
+            <Link
               href="/dashboard/login"
               className="text-sm text-indigo-600 hover:text-indigo-800"
             >
               Log in
-            </a>
+            </Link>
           </div>
         </Form>
       </motion.div>
     </div>
   );
 }
+
