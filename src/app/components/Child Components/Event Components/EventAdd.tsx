@@ -1,33 +1,72 @@
 "use client";
-import React from "react";
-import { Form, Input, DatePicker, Button, Modal } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
+import { Form, Input, DatePicker, Button, Modal, notification } from "antd";
 import moment from "moment";
+import { addEvent } from "@/lib/actions/eventActions";
 
 interface EventAddProps {
   isOpen: boolean;
   onClose: () => void;
   onAdd: (event: any) => void;
+  userId: string;
 }
 
-const EventAdd: React.FC<EventAddProps> = ({ isOpen, onClose, onAdd }) => {
+const EventAdd: React.FC<EventAddProps> = ({
+  isOpen,
+  onClose,
+  onAdd,
+  userId,
+}) => {
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (values: any) => {
-    const newEvent = {
-      id: Date.now(), // Simple way to generate unique id
+  const handleSubmit = async (values: any) => {
+    setLoading(true);
+    setError(null);
+
+    const eventData = {
       ...values,
       date: values.date.toISOString(),
+      userId: userId,
     };
-    onAdd(newEvent);
-    form.resetFields();
-    onClose();
+
+    try {
+      const response = await addEvent(eventData);
+
+      if (response.success) {
+        form.resetFields();
+        onClose();
+        onAdd(response.data);
+        notification.success({
+          message: "Event Created",
+          description: response.message,
+        });
+      } else {
+        setError(response.message);
+        notification.error({
+          message: "Error",
+          description: response.message,
+        });
+      }
+    } catch (error: any) {
+      setError("Failed to create event. Please try again.");
+      notification.error({
+        message: "Error",
+        description:
+          "There was an error creating your event. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Modal
       title={
-        <h2 className="text-2xl font-bold text-blue-800 mb-4">Create New Event</h2>
+        <h2 className="text-2xl font-bold text-blue-800 mb-4">
+          Create New Event
+        </h2>
       }
       open={isOpen}
       onCancel={onClose}
@@ -39,7 +78,7 @@ const EventAdd: React.FC<EventAddProps> = ({ isOpen, onClose, onAdd }) => {
         layout="vertical"
         onFinish={handleSubmit}
         initialValues={{
-          date: moment(),
+          date: moment().startOf("minute"),
         }}
       >
         <Form.Item
@@ -82,13 +121,17 @@ const EventAdd: React.FC<EventAddProps> = ({ isOpen, onClose, onAdd }) => {
         <Form.Item
           name="location"
           label="Location"
-          rules={[{ required: true, message: "Please input the event location!" }]}
+          rules={[
+            { required: true, message: "Please input the event location!" },
+          ]}
         >
           <Input
             placeholder="Enter event location"
             className="rounded-lg border-gray-300"
           />
         </Form.Item>
+
+        {error && <div className="text-red-500 mb-4 text-center">{error}</div>}
 
         <Form.Item className="mb-0 flex justify-end space-x-4">
           <Button onClick={onClose} className="rounded-lg">
@@ -98,8 +141,9 @@ const EventAdd: React.FC<EventAddProps> = ({ isOpen, onClose, onAdd }) => {
             type="primary"
             htmlType="submit"
             className="bg-blue-800 rounded-lg"
+            loading={loading}
           >
-            Create Event
+            {loading ? "Creating..." : "Create Event"}
           </Button>
         </Form.Item>
       </Form>
@@ -108,4 +152,3 @@ const EventAdd: React.FC<EventAddProps> = ({ isOpen, onClose, onAdd }) => {
 };
 
 export default EventAdd;
-

@@ -1,16 +1,22 @@
+"use client";
 import React, { useState } from "react";
 import EventTime from "./EventTime";
 import EventModify from "./EventModify";
 import { motion, AnimatePresence } from "framer-motion";
+import { deleteEvent } from "@/lib/actions/eventActions";
+import { notification } from "antd";
 
 interface EventCardProps {
-  id: number;
+  id: string;
   title: string;
   description: string;
   date: string;
   location: string;
-  onDelete: (id: number) => void;
-  onUpdate: (updatedEvent: any) => void; // Add this prop
+  userId: string;
+  currentUserId: string;
+  userRole: "USER" | "ADMIN";
+  onDelete: (id: string) => void;
+  onUpdate: (updatedEvent: any) => void;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -19,8 +25,11 @@ const EventCard: React.FC<EventCardProps> = ({
   description,
   date,
   location,
+  userId,
+  currentUserId,
+  userRole,
   onDelete,
-  onUpdate, // Add this prop
+  onUpdate,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isModifying, setIsModifying] = useState(false);
@@ -42,8 +51,28 @@ const EventCard: React.FC<EventCardProps> = ({
     setShowDeleteConfirmation(true);
   };
 
-  const handleDeleteConfirm = () => {
-    onDelete(id);
+  const handleDeleteConfirm = async () => {
+    try {
+      const response = await deleteEvent(id, currentUserId, userRole);
+      if (response.success) {
+        onDelete(id);
+        notification.success({
+          message: "Event Deleted",
+          description: response.message,
+        });
+      } else {
+        notification.error({
+          message: "Error",
+          description: response.message,
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      notification.error({
+        message: "Error",
+        description: "An unexpected error occurred while deleting the event.",
+      });
+    }
     setShowDeleteConfirmation(false);
   };
 
@@ -60,6 +89,8 @@ const EventCard: React.FC<EventCardProps> = ({
       ? description.substring(0, 100) + "..."
       : description;
   };
+
+  const canModify = userRole === "ADMIN" || userId === currentUserId;
 
   return (
     <div className="w-full bg-white shadow-lg rounded-lg p-6 mb-6 relative overflow-hidden">
@@ -82,20 +113,22 @@ const EventCard: React.FC<EventCardProps> = ({
         </div>
         <EventTime date={date} />
       </div>
-      <div className="flex justify-end space-x-4">
-        <button
-          onClick={openModifyForm}
-          className="text-blue-600 hover:underline font-medium focus:outline-none"
-        >
-          Modify
-        </button>
-        <button
-          onClick={handleDeleteClick}
-          className="text-red-600 hover:underline font-medium focus:outline-none"
-        >
-          Delete
-        </button>
-      </div>
+      {canModify && (
+        <div className="flex justify-end space-x-4">
+          <button
+            onClick={openModifyForm}
+            className="text-blue-600 hover:underline font-medium focus:outline-none"
+          >
+            Modify
+          </button>
+          <button
+            onClick={handleDeleteClick}
+            className="text-red-600 hover:underline font-medium focus:outline-none"
+          >
+            Delete
+          </button>
+        </div>
+      )}
 
       <AnimatePresence>
         {isModifying && (
@@ -135,6 +168,8 @@ const EventCard: React.FC<EventCardProps> = ({
                 event={{ id, title, description, date, location }}
                 onClose={closeModifyForm}
                 onUpdate={handleUpdate}
+                userId={currentUserId}
+                userRole={userRole}
               />
             </motion.div>
           </motion.div>

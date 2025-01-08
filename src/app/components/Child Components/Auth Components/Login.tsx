@@ -71,9 +71,10 @@ export default function Login() {
 
       if (result.success) {
         setUser({
-          id: result?.data?.id || null,
-          name: result?.data?.name || null,
-          email: result?.data?.email || null,
+          id: result?.data?.id || undefined,
+          name: result?.data?.name || undefined,
+          email: result?.data?.email || undefined,
+          role: result?.data?.role || undefined,
         });
         message.success(result.message);
         if (values.remember) {

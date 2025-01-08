@@ -12,9 +12,10 @@ function DashboardNav() {
   const router = useRouter();
   const handleLogout = (): void => {
     setUser({
-      id: null,
-      name: null,
-      email: null,
+      id: undefined,
+      name: undefined,
+      email: undefined,
+      role: undefined,
     });
     setShowLogoutConfirm(false);
     router.push("/");

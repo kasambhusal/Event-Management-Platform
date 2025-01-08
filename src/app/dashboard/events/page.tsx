@@ -12,7 +12,11 @@ export default function Page() {
 
   useEffect(() => {
     if (user) {
-      if (user.id === null || user.name === null || user.email === null) {
+      if (
+        user.id === undefined ||
+        user.name === undefined ||
+        user.email === undefined
+      ) {
         // If all user attributes are null, redirect to login
         router.push("/dashboard/login");
       } else {
