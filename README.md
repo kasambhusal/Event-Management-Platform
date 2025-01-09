@@ -49,10 +49,10 @@ The Event Management Platform is a web application built with Next.js 14 that en
 
 The project is organized as follows:
 
-├── .next/ # Next.js build output (auto-generated) \n
-├── node_modules/ # Installed dependencies (auto-generated)\n
-├── prisma/ # Prisma schema and migrations\n
-├── public/ # Static assets (favicon, images, etc.)\n
+├── .next/ # Next.js build output (auto-generated)
+├── node_modules/ # Installed dependencies (auto-generated)
+├── prisma/ # Prisma schema and migrations
+├── public/ # Static assets (favicon, images, etc.)
 ├── src/ # Main source code
 │ ├── app/ # App directory for Next.js routing
 │ │ ├── components/ # Reusable UI components
