@@ -13,7 +13,7 @@ The Event Management Platform is a web application built with Next.js 14 that en
 
 2. **Event Management:**
 
-   - Authenticated users can create, view, update, and delete events their own events.
+   - Authenticated users can create, view, update, and deletes their own events.
    - Admins can manage all events, while users can manage all events.
 
 3. **Server Actions:**
@@ -49,10 +49,10 @@ The Event Management Platform is a web application built with Next.js 14 that en
 
 The project is organized as follows:
 
-├── .next/ # Next.js build output (auto-generated)
-├── node_modules/ # Installed dependencies (auto-generated)
-├── prisma/ # Prisma schema and migrations
-├── public/ # Static assets (favicon, images, etc.)
+├── .next/ # Next.js build output (auto-generated) \n
+├── node_modules/ # Installed dependencies (auto-generated)\n
+├── prisma/ # Prisma schema and migrations\n
+├── public/ # Static assets (favicon, images, etc.)\n
 ├── src/ # Main source code
 │ ├── app/ # App directory for Next.js routing
 │ │ ├── components/ # Reusable UI components
@@ -122,13 +122,14 @@ During the demo, you can showcase:
 
 1.  User authentication and role-based access control.
 2.  Event CRUD operations:
-    i.  Create an event.
+    i. Create an event.
     ii. View your own events as a User or all events as an Admin.
     iii. Update and delete events.
 3.  Validation error messages for invalid inputs.
 4.  Responsive design on various screen sizes.
 
 ### Setup Instructions
+
 For now there is only one Admin, you can test Admin role from following credentials:
-    Email:- kasambhusal123@gmail.com
-    password:- kasam123
+Email:- kasambhusal123@gmail.com
+password:- kasam123
