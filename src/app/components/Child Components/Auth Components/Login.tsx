@@ -55,7 +55,7 @@ export default function Login() {
     if (user.email && user.id && user.name) {
       router.push("/dashboard/events");
     }
-  }, []);
+  }, [router, user.email, user.id, user.name]);
   const onFinish = async (values: LoginFormValues) => {
     if (!values.password) {
       console.error("Password is missing");
@@ -77,7 +77,7 @@ export default function Login() {
           role: result?.data?.role || undefined,
         });
         message.success(result.message);
-        
+
         if (values.remember) {
           const encryptedPassword = encrypt(values.password);
           console.log("Saving to localStorage:", {
@@ -183,7 +183,7 @@ export default function Login() {
           </Form.Item>
 
           <div className="text-center mt-4">
-            <p className="text-gray-600">Don't have an account? </p>
+            <p className="text-gray-600">Don&apos;t have an account? </p>
             <Link
               href="/dashboard/sign-up"
               className="text-sm text-indigo-600 hover:text-indigo-800"

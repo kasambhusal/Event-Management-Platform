@@ -60,7 +60,7 @@ function Event() {
     setEvents([newEvent, ...events]);
   };
 
-  const handleUpdate = (updatedEvent: Event) => {
+  const handleUpdate = (updatedEvent: Event): void => {
     setEvents(
       events.map((event) =>
         event.id === updatedEvent.id ? updatedEvent : event

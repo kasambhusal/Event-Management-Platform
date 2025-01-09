@@ -50,6 +50,9 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.0.0(react@19.0.0)
+      uuid:
+        specifier: ^11.0.4
+        version: 11.0.4
       zod:
         specifier: ^3.24.1
         version: 3.24.1
@@ -75,8 +78,14 @@ importers:
       '@types/react-dom':
         specifier: ^19
         version: 19.0.2(@types/react@19.0.3)
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.19.1
+        version: 8.19.1(@typescript-eslint/parser@8.19.1(eslint@9.17.0(jiti@1.21.7))(typescript@5.7.2))(eslint@9.17.0(jiti@1.21.7))(typescript@5.7.2)
+      '@typescript-eslint/parser':
+        specifier: ^8.19.1
+        version: 8.19.1(eslint@9.17.0(jiti@1.21.7))(typescript@5.7.2)
       eslint:
-        specifier: ^9
+        specifier: ^9.17.0
         version: 9.17.0(jiti@1.21.7)
       eslint-config-next:
         specifier: 15.1.3
@@ -2579,6 +2588,10 @@ packages:
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+
+  uuid@11.0.4:
+    resolution: {integrity: sha512-IzL6VtTTYcAhA/oghbFJ1Dkmqev+FpQWnCBaKq/gUluLxliWvO8DPFWfIviRmYbtaavtSQe4WBL++rFjdcGWEg==}
+    hasBin: true
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
@@ -5590,6 +5603,8 @@ snapshots:
       punycode: 2.3.1
 
   util-deprecate@1.0.2: {}
+
+  uuid@11.0.4: {}
 
   uuid@8.3.2: {}
 

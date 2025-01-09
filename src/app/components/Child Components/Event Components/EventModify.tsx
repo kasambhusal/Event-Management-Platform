@@ -4,16 +4,20 @@ import { Form, Input, Button, notification } from "antd";
 import moment from "moment";
 import { modifyEvent } from "@/lib/actions/eventActions";
 
+// Define Event type
+interface Event {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  location: string;
+  userId: string;
+}
+
 interface EventModifyProps {
-  event: {
-    id: string;
-    title: string;
-    description: string;
-    date: string;
-    location: string;
-  };
+  event: Event; // Updated to Event type
   onClose: () => void;
-  onUpdate: (updatedEvent: any) => void;
+  onUpdate: (updatedEvent: Event) => void; // Updated to Event type
   userId: string;
   userRole: "USER" | "ADMIN";
 }
@@ -28,9 +32,11 @@ const EventModify: React.FC<EventModifyProps> = ({
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: Event) => {
+    // Updated to Event type
     setLoading(true);
-    const updatedEvent = {
+    const updatedEvent: Event = {
+      // Updated to Event type
       ...event,
       ...values,
       date: new Date(values.date).toISOString(), // Convert to ISO string
@@ -43,7 +49,7 @@ const EventModify: React.FC<EventModifyProps> = ({
         userId,
         userRole
       );
-      if (response.success) {
+      if (response.success && response.data) {
         onUpdate(response.data);
         onClose();
         notification.success({
@@ -56,7 +62,7 @@ const EventModify: React.FC<EventModifyProps> = ({
           description: response.message,
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error updating event:", error);
       notification.error({
         message: "Error",
@@ -95,19 +101,12 @@ const EventModify: React.FC<EventModifyProps> = ({
         </Form.Item>
         <Form.Item
           name="date"
-          label="Date and Time"
-          rules={[
-            { required: true, message: "Please select the date and time!" },
-          ]}
+          label="Date"
+          rules={[{ required: true, message: "Please input the date!" }]}
         >
-          <input
+          <Input
             type="datetime-local"
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
-            style={{
-              appearance: "none",
-              background: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E") no-repeat right 8px center / 16px`,
-              paddingRight: "30px",
-            }}
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </Form.Item>
         <Form.Item
@@ -117,22 +116,19 @@ const EventModify: React.FC<EventModifyProps> = ({
         >
           <Input className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </Form.Item>
-        <Form.Item className="mb-0 flex justify-end space-x-4">
-          <Button
-            onClick={onClose}
-            className="px-4 py-2 mr-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-          >
+        <div className="flex justify-between items-center">
+          <Button onClick={onClose} className="bg-gray-500 text-white">
             Cancel
           </Button>
           <Button
             type="primary"
             htmlType="submit"
-            className="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700"
             loading={loading}
+            className="bg-blue-600 text-white"
           >
             Save Changes
           </Button>
-        </Form.Item>
+        </div>
       </Form>
     </div>
   );

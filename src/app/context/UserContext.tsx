@@ -1,4 +1,5 @@
 "use client";
+
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 // Define the User type
@@ -13,24 +14,30 @@ interface User {
 interface UserContextType {
   user: User;
   setUser: React.Dispatch<React.SetStateAction<User>>;
+  updateUserContext: (user: User) => void;
+  logout: () => void;
 }
 
 // Create the context with a default value of `undefined`
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // Create the provider component
-export const UserProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
-  const [user, setUser] = useState<User>({
-    id: undefined,
-    name: undefined,
-    email: undefined,
-    role: undefined,
-  });
+export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User>({});
+
+  const updateUserContext = (updatedUser: User): void => {
+    setUser((prevUser) => ({
+      ...prevUser,
+      ...updatedUser,
+    }));
+  };
+
+  const logout = (): void => {
+    setUser({});
+  };
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, updateUserContext, logout }}>
       {children}
     </UserContext.Provider>
   );

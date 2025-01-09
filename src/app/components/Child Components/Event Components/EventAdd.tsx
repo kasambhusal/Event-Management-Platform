@@ -1,13 +1,27 @@
-"use client";
 import React, { useState } from "react";
-import { Form, Input, DatePicker, Button, Modal, notification } from "antd";
+import { Form, Input, Button, Modal, notification } from "antd";
 import moment from "moment";
 import { addEvent } from "@/lib/actions/eventActions";
+
+interface EventFormValues {
+  title: string;
+  description: string;
+  date: moment.Moment;
+  location: string;
+}
+interface Event {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  location: string;
+  userId: string;
+}
 
 interface EventAddProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (event: any) => void;
+  onAdd: (event: Event) => void;
   userId: string;
 }
 
@@ -18,10 +32,10 @@ const EventAdd: React.FC<EventAddProps> = ({
   userId,
 }) => {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: EventFormValues) => {
     setLoading(true);
     setError(null);
 
@@ -34,7 +48,7 @@ const EventAdd: React.FC<EventAddProps> = ({
     try {
       const response = await addEvent(eventData);
 
-      if (response.success) {
+      if (response.success && response.data) {
         form.resetFields();
         onClose();
         onAdd(response.data);
@@ -49,8 +63,12 @@ const EventAdd: React.FC<EventAddProps> = ({
           description: response.message,
         });
       }
-    } catch (error: any) {
-      setError("Failed to create event. Please try again.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Failed to create event. Please try again.");
+      }
       notification.error({
         message: "Error",
         description:

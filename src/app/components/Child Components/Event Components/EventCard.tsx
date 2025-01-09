@@ -6,6 +6,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { deleteEvent } from "@/lib/actions/eventActions";
 import { notification } from "antd";
 
+// Define Event type
+interface Event {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  location: string;
+  userId: string;
+}
+
 interface EventCardProps {
   id: string;
   title: string;
@@ -16,7 +26,7 @@ interface EventCardProps {
   currentUserId: string;
   userRole: "USER" | "ADMIN";
   onDelete: (id: string) => void;
-  onUpdate: (updatedEvent: any) => void;
+  onUpdate: (updatedEvent: Event) => void; // Updated to Event type
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -66,7 +76,7 @@ const EventCard: React.FC<EventCardProps> = ({
           description: response.message,
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error deleting event:", error);
       notification.error({
         message: "Error",
@@ -76,7 +86,8 @@ const EventCard: React.FC<EventCardProps> = ({
     setShowDeleteConfirmation(false);
   };
 
-  const handleUpdate = (updatedEvent: any) => {
+  const handleUpdate = (updatedEvent: Event) => {
+    // Updated to Event type
     onUpdate(updatedEvent);
     setIsModifying(false);
   };
@@ -165,7 +176,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 </svg>
               </button>
               <EventModify
-                event={{ id, title, description, date, location }}
+                event={{ id, title, description, date, location, userId }}
                 onClose={closeModifyForm}
                 onUpdate={handleUpdate}
                 userId={currentUserId}

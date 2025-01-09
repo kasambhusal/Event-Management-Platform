@@ -61,7 +61,7 @@ function Home() {
           </h2>
           <p className="text-gray-600">
             Monitor attendee participation with real-time analytics to ensure
-            your event's success.
+            your event &#x27; s success.
           </p>
         </div>
 

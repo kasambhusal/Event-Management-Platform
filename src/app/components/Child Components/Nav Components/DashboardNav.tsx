@@ -1,89 +1,94 @@
+"use client";
 import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { LogoutOutlined } from "@ant-design/icons";
-import Image from "next/image";
 import Link from "next/link";
-import { useUser } from "@/app/context/UserContext";
 import { useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { useUser } from "@/app/context/UserContext";
+import { Settings, LogOut, User } from "lucide-react";
+import AccountManagement from "../Other Components/AccountManagement";
+import Image from "next/image";
 
-function DashboardNav() {
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const { user, setUser } = useUser();
+const DashboardNav = () => {
   const router = useRouter();
-  const handleLogout = (): void => {
-    setUser({
-      id: undefined,
-      name: undefined,
-      email: undefined,
-      role: undefined,
-    });
-    setShowLogoutConfirm(false);
-    router.push("/");
+  const { user, logout } = useUser();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showAccountManagement, setShowAccountManagement] = useState(false);
+
+  const handleLogout = () => {
+    setShowLogoutConfirm(true);
   };
 
-  const toggleLogoutConfirm = () => {
-    setShowLogoutConfirm((prev) => !prev);
+  const confirmLogout = () => {
+    logout();
+    router.push("/dashboard/login");
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutConfirm(false);
   };
 
   return (
-    <div className="w-full h-[8vh] bg-blue-800 shadow-lg">
-      <motion.div
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full flex h-full"
-      >
-        <div className="w-full px-[5%] flex justify-between items-center">
-          {/* Logo */}
-          <Link href="/">
-            <Image src="/logo.jpg" width={150} height={50} alt="Logo" />
-          </Link>
-
-          {/* Welcome Message */}
-          <h1 className="text-lg font-medium text-white">
-            Hi, {user?.name || "Unknown User"}
-          </h1>
-
-          {/* Logout Icon with Dropdown */}
-          <div className="relative">
-            <LogOut
-              style={{ fontSize: "25px", color: "white", cursor: "pointer" }}
-              onClick={toggleLogoutConfirm}
-            />
-
-            {showLogoutConfirm && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="absolute right-0 mt-2 bg-white shadow-md rounded-lg p-4 z-50"
+    <nav className="bg-blue-600 py-2 px-2 md:px-[10%] flex justify-between items-center">
+      <Link href="/dashboard" className="text-white text-2xl font-bold">
+        <Image src="/logo.jpg" width={150} height={80} alt="Logo" />
+      </Link>
+      <h1 className="text-white font-bold">Hi, {user.name}</h1>
+      <div className="relative">
+        <button
+          onClick={() => setShowDropdown(!showDropdown)}
+          className="text-white hover:text-blue-200"
+        >
+          <Settings size={24} />
+        </button>
+        {showDropdown && (
+          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+            <button
+              onClick={() => {
+                setShowAccountManagement(true);
+                setShowDropdown(false);
+              }}
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+            >
+              <User className="inline-block mr-2" size={18} />
+              Manage Account
+            </button>
+            <button
+              onClick={handleLogout}
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+            >
+              <LogOut className="inline-block mr-2" size={18} />
+              Logout
+            </button>
+          </div>
+        )}
+      </div>
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl">
+            <h2 className="text-xl font-bold mb-4">Confirm Logout</h2>
+            <p className="mb-4">Are you sure you want to log out?</p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={cancelLogout}
+                className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
               >
-                <p className="text-gray-700 mb-4">
-                  Are you sure you want to logout?
-                </p>
-                <div className="flex justify-end space-x-2">
-                  <button
-                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-gray-700"
-                    onClick={() => setShowLogoutConfirm(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    className="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700"
-                    onClick={handleLogout}
-                  >
-                    Confirm
-                  </button>
-                </div>
-              </motion.div>
-            )}
+                Cancel
+              </button>
+              <button
+                onClick={confirmLogout}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
-      </motion.div>
-    </div>
+      )}
+      {showAccountManagement && (
+        <AccountManagement onClose={() => setShowAccountManagement(false)} />
+      )}
+    </nav>
   );
-}
+};
 
 export default DashboardNav;
