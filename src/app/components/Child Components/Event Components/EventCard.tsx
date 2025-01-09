@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { deleteEvent } from "@/lib/actions/eventActions";
 import { notification } from "antd";
 import {
-  Calendar,
   MapPin,
   ChevronDown,
   ChevronUp,

@@ -75,7 +75,7 @@ function Event() {
   };
 
   const filteredAndSortedEvents = useMemo(() => {
-    let filtered = events.filter((event) =>
+    const filtered = events.filter((event) =>
       event.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 

@@ -4,7 +4,6 @@ import { useUser } from "@/app/context/UserContext";
 import { updateUser } from "@/lib/actions/userActions";
 import { X } from "lucide-react";
 import { Form, Input, Button, message } from "antd";
-import { EnvelopeIcon } from "@heroicons/react/24/solid";
 
 interface AccountManagementProps {
   onClose: () => void;
@@ -33,6 +32,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({ onClose }) => {
       }
     } catch (error) {
       message.error("An error occurred while updating the profile.");
+      console.log("Error on Updating User profile", error)
     }
   };
 
