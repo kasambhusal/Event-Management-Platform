@@ -5,12 +5,20 @@ import Events from "@/app/components/Child Components/Event Components/Event";
 import { useUser } from "@/app/context/UserContext";
 import Loader from "@/app/components/Child Components/Other Components/Loader";
 import RoadBlocking from "@/app/components/Child Components/Other Components/RoadBlocking";
+import { checkFirstVisit } from "@/lib/utils/firstVisit";
 
 export default function Page() {
   const { user } = useUser();
   const [currentUser, setCurrentUser] = useState<typeof user | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const [showRoadBlocking, setShowRoadBlocking] = useState(false);
+
+  useEffect(() => {
+    const isFirstVisit = checkFirstVisit();
+    setShowRoadBlocking(isFirstVisit);
+    
+  }, []);
 
   useEffect(() => {
     const checkUser = () => {
@@ -31,7 +39,7 @@ export default function Page() {
     const timer = setTimeout(() => {
       checkUser();
       setLoading(false);
-    }, 1000); // Show loader for 1 second
+    }, 600); // Show loader for 1 second
 
     return () => clearTimeout(timer);
   }, [user, router]);
@@ -46,8 +54,8 @@ export default function Page() {
 
   return (
     <>
-      <RoadBlocking />
       <Events />
+      {showRoadBlocking && <RoadBlocking />}
     </>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LogOut,
   Plus,
@@ -20,7 +20,9 @@ interface Feature {
 export default function RoadBlocking() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
-
+  useEffect(() => {
+    localStorage.setItem("hasSeenEventsTour", "true");
+  }, []);
   const features: Feature[] = [
     {
       title: "Welcome to EventSphere!",
