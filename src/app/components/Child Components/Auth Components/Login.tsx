@@ -56,6 +56,7 @@ export default function Login() {
       router.push("/dashboard/events");
     }
   }, [router, user.email, user.id, user.name]);
+  
   const onFinish = async (values: LoginFormValues) => {
     if (!values.password) {
       console.error("Password is missing");

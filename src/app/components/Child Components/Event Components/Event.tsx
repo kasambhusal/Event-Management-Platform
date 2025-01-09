@@ -41,7 +41,7 @@ function Event() {
         } else {
           setError("User ID or role is missing.");
         }
-      } catch (error) {
+      } catch (error: unknown) {
         setError("An error occurred while fetching events.");
         console.error("Error fetching events:", error);
       } finally {
@@ -74,9 +74,9 @@ function Event() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="w-screen h-[92vh] bg-gray-500 flex justify-center items-center p-1">
+      <div className="w-screen h-[92vh] bg-gray-100 flex justify-center items-center p-1">
         <div
-          className="w-full h-full bg-blue-100 flex flex-col items-center"
+          className="w-full h-full bg-blue-200 flex flex-col items-center"
           style={{ borderRadius: "15px", overflowY: "scroll" }}
         >
           {/* Add Event Button */}
