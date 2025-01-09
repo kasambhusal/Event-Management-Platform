@@ -13,8 +13,8 @@ The Event Management Platform is a web application built with Next.js 14 that en
 
 2. **Event Management:**
 
-   - Authenticated users can create, view, update, and delete events.
-   - Admins can manage all events, while users can manage only their own events.
+   - Authenticated users can create, view, update, and delete events their own events.
+   - Admins can manage all events, while users can manage all events.
 
 3. **Server Actions:**
 
