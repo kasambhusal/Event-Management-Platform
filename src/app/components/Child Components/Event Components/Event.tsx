@@ -1,12 +1,14 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button, Spin } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Button, Spin, Select, Input, Pagination } from "antd";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import EventCard from "./EventCard";
 import EventAdd from "./EventAdd";
 import { useUser } from "@/app/context/UserContext";
 import { getEvents } from "@/lib/actions/eventActions";
+
+const { Option } = Select;
 
 interface Event {
   id: string;
@@ -23,6 +25,10 @@ function Event() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<"latest" | "oldest">("latest");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -68,6 +74,27 @@ function Event() {
     );
   };
 
+  const filteredAndSortedEvents = useMemo(() => {
+    let filtered = events.filter((event) =>
+      event.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return filtered.sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return sortOrder === "latest" ? dateB - dateA : dateA - dateB;
+    });
+  }, [events, sortOrder, searchTerm]);
+
+  const paginatedEvents = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredAndSortedEvents.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredAndSortedEvents, currentPage, itemsPerPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -79,8 +106,24 @@ function Event() {
           className="w-full h-full bg-blue-200 flex flex-col items-center"
           style={{ borderRadius: "15px", overflowY: "scroll" }}
         >
-          {/* Add Event Button */}
-          <div className="w-[98%] sm:w-[95%] md:w-[60%] flex justify-end pt-4">
+          {/* Filter and Add Event Controls */}
+          <div className="w-[98%] sm:w-[95%] md:w-[60%] flex justify-between flex-wrap items-center pt-4">
+            <div className="flex items-center  space-x-2 flex-wrap">
+              <Select
+                defaultValue="latest"
+                style={{ width: 120 }}
+                onChange={(value: "latest" | "oldest") => setSortOrder(value)}
+              >
+                <Option value="latest">Latest</Option>
+                <Option value="oldest">Oldest</Option>
+              </Select>
+              <Input
+                placeholder="Search by title"
+                prefix={<SearchOutlined />}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{ width: 200 }}
+              />
+            </div>
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -101,8 +144,8 @@ function Event() {
               <div className="text-center text-red-500">{error}</div>
             ) : (
               <AnimatePresence>
-                {events.length > 0 ? (
-                  events.map((event) => (
+                {paginatedEvents.length > 0 ? (
+                  paginatedEvents.map((event) => (
                     <motion.div
                       key={event.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -131,15 +174,30 @@ function Event() {
             )}
           </div>
 
-          {/* Add Event Modal */}
-          {user && (
-            <EventAdd
-              isOpen={isAddModalOpen}
-              onClose={() => setIsAddModalOpen(false)}
-              onAdd={handleAdd}
-              userId={user.id || "undefined"}
-            />
+          {/* Pagination */}
+          {filteredAndSortedEvents.length > itemsPerPage && (
+            <div className="w-[98%] sm:w-[95%] md:w-[60%] flex justify-center mt-4 mb-8">
+              <Pagination
+                current={currentPage}
+                total={filteredAndSortedEvents.length}
+                pageSize={itemsPerPage}
+                onChange={handlePageChange}
+                showSizeChanger={false}
+              />
+            </div>
           )}
+
+          {/* Add Event Modal */}
+          <AnimatePresence>
+            {isAddModalOpen && user && (
+              <EventAdd
+                isOpen={isAddModalOpen}
+                onClose={() => setIsAddModalOpen(false)}
+                onAdd={handleAdd}
+                userId={user.id || "undefined"}
+              />
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </motion.div>

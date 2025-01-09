@@ -20,7 +20,7 @@ const DashboardNav = () => {
 
   const confirmLogout = () => {
     logout();
-    router.push("/dashboard/login");
+    router.push("/");
   };
 
   const cancelLogout = () => {
@@ -28,11 +28,14 @@ const DashboardNav = () => {
   };
 
   return (
-    <nav className="bg-blue-600 py-2 px-2 md:px-[10%] flex justify-between items-center">
-      <Link href="/dashboard" className="text-white text-2xl font-bold">
+    <nav className="bg-blue-600 py-2 px-2 md:px-[10%] flex flex-wrap justify-between items-center">
+      <Link href="/" className="text-white text-2xl font-bold">
         <Image src="/logo.jpg" width={150} height={80} alt="Logo" />
       </Link>
-      <h1 className="text-white font-bold">Hi, {user.name}</h1>
+      <h1 className="text-white font-bold">
+        Hi, {user.name}
+        {user.role === "ADMIN" && <button className="ml-[5px] text-[10px]  bg-white text-red-600 px-2 py-[1px] rounded-xl">ADMIN</button>}{" "}
+      </h1>
       <div className="relative">
         <button
           onClick={() => setShowDropdown(!showDropdown)}

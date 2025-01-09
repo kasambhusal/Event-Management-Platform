@@ -1,14 +1,18 @@
+"use client";
 import React, { useState } from "react";
-import { Form, Input, Button, Modal, notification } from "antd";
+import { Form, Input, Button, notification } from "antd";
+import { motion } from "framer-motion";
 import moment from "moment";
 import { addEvent } from "@/lib/actions/eventActions";
+import { X } from 'lucide-react';
 
 interface EventFormValues {
   title: string;
   description: string;
-  date: moment.Moment;
+  date: string;
   location: string;
 }
+
 interface Event {
   id: string;
   title: string;
@@ -33,19 +37,22 @@ const EventAdd: React.FC<EventAddProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (values: EventFormValues) => {
     setLoading(true);
-    setError(null);
-
-    const eventData = {
-      ...values,
-      date: values.date.toISOString(),
-      userId: userId,
-    };
 
     try {
+      const formattedDate = moment(values.date, "YYYY-MM-DDTHH:mm");
+      if (!formattedDate.isValid()) {
+        throw new Error("Invalid date format. Please provide a valid date.");
+      }
+
+      const eventData = {
+        ...values,
+        date: formattedDate.toISOString(),
+        userId: userId,
+      };
+
       const response = await addEvent(eventData);
 
       if (response.success && response.data) {
@@ -57,119 +64,110 @@ const EventAdd: React.FC<EventAddProps> = ({
           description: response.message,
         });
       } else {
-        setError(response.message);
-        notification.error({
-          message: "Error",
-          description: response.message,
-        });
+        throw new Error(response.message);
       }
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError("Failed to create event. Please try again.");
-      }
+      const errorMessage = error instanceof Error ? error.message : "Failed to create event. Please try again.";
       notification.error({
         message: "Error",
-        description:
-          "There was an error creating your event. Please try again.",
+        description: errorMessage,
       });
     } finally {
       setLoading(false);
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Modal
-      title={
-        <h2 className="text-2xl font-bold text-blue-800 mb-4">
-          Create New Event
-        </h2>
-      }
-      open={isOpen}
-      onCancel={onClose}
-      footer={null}
-      width={600}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-gray-800 bg-opacity-50 backdrop-blur-sm overflow-y-auto min-h-screen w-screen flex justify-center items-center z-50"
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        initialValues={{
-          date: moment().startOf("minute"),
-        }}
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="bg-white w-full max-w-4xl rounded-lg shadow-2xl p-8 m-4"
       >
-        <Form.Item
-          name="title"
-          label="Title"
-          rules={[{ required: true, message: "Please input the event title!" }]}
-        >
-          <Input
-            placeholder="Enter event title"
-            className="rounded-lg border-gray-300"
-          />
-        </Form.Item>
-
-        <Form.Item
-          name="description"
-          label="Description"
-          rules={[
-            { required: true, message: "Please input the event description!" },
-          ]}
-        >
-          <Input.TextArea
-            placeholder="Enter event description"
-            className="rounded-lg border-gray-300"
-            rows={4}
-          />
-        </Form.Item>
-
-        <Form.Item
-          name="date"
-          label="Date and Time"
-          rules={[{ required: true, message: "Please select the event date!" }]}
-        >
-          <input
-            type="datetime-local"
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
-            style={{
-              appearance: "none",
-              background: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E") no-repeat right 8px center / 16px`,
-              paddingRight: "30px",
-            }}
-          />
-        </Form.Item>
-
-        <Form.Item
-          name="location"
-          label="Location"
-          rules={[
-            { required: true, message: "Please input the event location!" },
-          ]}
-        >
-          <Input
-            placeholder="Enter event location"
-            className="rounded-lg border-gray-300"
-          />
-        </Form.Item>
-
-        {error && <div className="text-red-500 mb-4 text-center">{error}</div>}
-
-        <Form.Item className="mb-0 flex justify-end space-x-4">
-          <Button onClick={onClose} className="rounded-lg">
-            Cancel
-          </Button>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-3xl font-bold text-blue-600">Create New Event</h2>
           <Button
-            type="primary"
-            htmlType="submit"
-            className="bg-blue-800 rounded-lg"
-            loading={loading}
+            icon={<X size={24} />}
+            onClick={onClose}
+            className="border-none shadow-none text-gray-500 hover:text-gray-700"
+          />
+        </div>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+          initialValues={{
+            date: moment().format("YYYY-MM-DDTHH:mm"),
+          }}
+          className="space-y-6"
+        >
+          <Form.Item
+            name="title"
+            label="Title"
+            rules={[{ required: true, message: "Please input the event title!" }]}
           >
-            {loading ? "Creating..." : "Create Event"}
-          </Button>
-        </Form.Item>
-      </Form>
-    </Modal>
+            <Input className="w-full px-4 py-2 text-lg border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </Form.Item>
+
+          <Form.Item
+            name="description"
+            label="Description"
+            rules={[{ required: true, message: "Please input the event description!" }]}
+          >
+            <Input.TextArea
+              className="w-full px-4 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={6}
+            />
+          </Form.Item>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Form.Item
+              name="date"
+              label="Date and Time"
+              rules={[{ required: true, message: "Please select the event date!" }]}
+            >
+              <Input
+                type="datetime-local"
+                className="w-full px-4 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="location"
+              label="Location"
+              rules={[{ required: true, message: "Please input the event location!" }]}
+            >
+              <Input className="w-full px-4 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </Form.Item>
+          </div>
+
+          <div className="flex justify-end space-x-4">
+            <Button
+              onClick={onClose}
+              className="px-6 py-2 text-base bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 transition-colors"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              className="px-6 py-2 text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
+            >
+              {loading ? "Creating..." : "Create Event"}
+            </Button>
+          </div>
+        </Form>
+      </motion.div>
+    </motion.div>
   );
 };
 

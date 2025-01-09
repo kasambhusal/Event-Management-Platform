@@ -1,10 +1,11 @@
 "use client";
 import React, { useState } from "react";
 import { Form, Input, Button, notification } from "antd";
+import { motion } from "framer-motion";
 import moment from "moment";
 import { modifyEvent } from "@/lib/actions/eventActions";
+import { X } from "lucide-react";
 
-// Define Event type
 interface Event {
   id: string;
   title: string;
@@ -15,9 +16,9 @@ interface Event {
 }
 
 interface EventModifyProps {
-  event: Event; // Updated to Event type
+  event: Event;
   onClose: () => void;
-  onUpdate: (updatedEvent: Event) => void; // Updated to Event type
+  onUpdate: (updatedEvent: Event) => void;
   userId: string;
   userRole: "USER" | "ADMIN";
 }
@@ -33,13 +34,11 @@ const EventModify: React.FC<EventModifyProps> = ({
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (values: Event) => {
-    // Updated to Event type
     setLoading(true);
     const updatedEvent: Event = {
-      // Updated to Event type
       ...event,
       ...values,
-      date: new Date(values.date).toISOString(), // Convert to ISO string
+      date: new Date(values.date).toISOString(),
     };
 
     try {
@@ -74,63 +73,95 @@ const EventModify: React.FC<EventModifyProps> = ({
   };
 
   return (
-    <div className="p-6 w-full relative">
-      <h2 className="text-2xl font-bold text-blue-800 mb-4">Modify Event</h2>
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={{
-          ...event,
-          date: moment(event.date).format("YYYY-MM-DDTHH:mm"), // Format for datetime-local input
-        }}
-        onFinish={handleSubmit}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-gray-800 bg-opacity-50 backdrop-blur-sm overflow-y-auto min-h-screen w-screen flex justify-center items-center z-50"
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="bg-white w-full max-w-4xl rounded-lg shadow-2xl p-8 m-4"
       >
-        <Form.Item
-          name="title"
-          label="Title"
-          rules={[{ required: true, message: "Please input the title!" }]}
-        >
-          <Input className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        </Form.Item>
-        <Form.Item
-          name="description"
-          label="Description"
-          rules={[{ required: true, message: "Please input the description!" }]}
-        >
-          <Input.TextArea className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        </Form.Item>
-        <Form.Item
-          name="date"
-          label="Date"
-          rules={[{ required: true, message: "Please input the date!" }]}
-        >
-          <Input
-            type="datetime-local"
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </Form.Item>
-        <Form.Item
-          name="location"
-          label="Location"
-          rules={[{ required: true, message: "Please input the location!" }]}
-        >
-          <Input className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        </Form.Item>
-        <div className="flex justify-between items-center">
-          <Button onClick={onClose} className="bg-gray-500 text-white">
-            Cancel
-          </Button>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-3xl font-bold text-blue-600">Modify Event</h2>
           <Button
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-            className="bg-blue-600 text-white"
-          >
-            Save Changes
-          </Button>
+            icon={<X size={24} />}
+            onClick={onClose}
+            className="border-none shadow-none text-gray-500 hover:text-gray-700"
+          />
         </div>
-      </Form>
-    </div>
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={{
+            ...event,
+            date: moment(event.date).format("YYYY-MM-DDTHH:mm"),
+          }}
+          onFinish={handleSubmit}
+          className="space-y-6"
+        >
+          <Form.Item
+            name="title"
+            label="Title"
+            rules={[{ required: true, message: "Please input the title!" }]}
+          >
+            <Input className="w-full px-4 py-2 text-lg border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </Form.Item>
+          <Form.Item
+            name="description"
+            label="Description"
+            rules={[
+              { required: true, message: "Please input the description!" },
+            ]}
+          >
+            <Input.TextArea
+              className="w-full px-4 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={6}
+            />
+          </Form.Item>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Form.Item
+              name="date"
+              label="Date and Time"
+              rules={[{ required: true, message: "Please input the date!" }]}
+            >
+              <Input
+                type="datetime-local"
+                className="w-full px-4 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </Form.Item>
+            <Form.Item
+              name="location"
+              label="Location"
+              rules={[
+                { required: true, message: "Please input the location!" },
+              ]}
+            >
+              <Input className="w-full px-4 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </Form.Item>
+          </div>
+          <div className="flex justify-end space-x-4">
+            <Button
+              onClick={onClose}
+              className="px-6 py-2 text-base bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 transition-colors"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              className="px-6 py-2 text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
+            >
+              Save Changes
+            </Button>
+          </div>
+        </Form>
+      </motion.div>
+    </motion.div>
   );
 };
 

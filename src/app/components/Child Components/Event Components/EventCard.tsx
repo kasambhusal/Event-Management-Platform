@@ -5,8 +5,15 @@ import EventModify from "./EventModify";
 import { motion, AnimatePresence } from "framer-motion";
 import { deleteEvent } from "@/lib/actions/eventActions";
 import { notification } from "antd";
+import {
+  Calendar,
+  MapPin,
+  ChevronDown,
+  ChevronUp,
+  Edit2,
+  Trash2,
+} from "lucide-react";
 
-// Define Event type
 interface Event {
   id: string;
   title: string;
@@ -26,7 +33,7 @@ interface EventCardProps {
   currentUserId: string;
   userRole: "USER" | "ADMIN";
   onDelete: (id: string) => void;
-  onUpdate: (updatedEvent: Event) => void; // Updated to Event type
+  onUpdate: (updatedEvent: Event) => void;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -45,21 +52,10 @@ const EventCard: React.FC<EventCardProps> = ({
   const [isModifying, setIsModifying] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
-  const toggleDescription = () => {
-    setIsExpanded(!isExpanded);
-  };
-
-  const openModifyForm = () => {
-    setIsModifying(true);
-  };
-
-  const closeModifyForm = () => {
-    setIsModifying(false);
-  };
-
-  const handleDeleteClick = () => {
-    setShowDeleteConfirmation(true);
-  };
+  const toggleDescription = () => setIsExpanded(!isExpanded);
+  const openModifyForm = () => setIsModifying(true);
+  const closeModifyForm = () => setIsModifying(false);
+  const handleDeleteClick = () => setShowDeleteConfirmation(true);
 
   const handleDeleteConfirm = async () => {
     try {
@@ -87,15 +83,12 @@ const EventCard: React.FC<EventCardProps> = ({
   };
 
   const handleUpdate = (updatedEvent: Event) => {
-    // Updated to Event type
     onUpdate(updatedEvent);
     setIsModifying(false);
   };
 
   const renderDescription = () => {
-    if (isExpanded) {
-      return description;
-    }
+    if (isExpanded) return description;
     return description.length > 100
       ? description.substring(0, 100) + "..."
       : description;
@@ -104,127 +97,139 @@ const EventCard: React.FC<EventCardProps> = ({
   const canModify = userRole === "ADMIN" || userId === currentUserId;
 
   return (
-    <div className="w-full bg-white shadow-lg rounded-lg p-6 mb-6 relative overflow-hidden">
-      <h2 className="text-xl font-semibold text-blue-800 mb-2">{title}</h2>
-      <p className="text-gray-700 mb-4">
-        {renderDescription()}
-        {description.length > 100 && (
-          <button
-            onClick={toggleDescription}
-            className="text-blue-600 font-medium ml-1 hover:underline focus:outline-none"
-          >
-            {isExpanded ? "See less" : "See more"}
-          </button>
-        )}
-      </p>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-        <div className="text-gray-500 text-sm mb-2 sm:mb-0">
-          <span className="font-medium text-gray-800">Location: </span>
-          {location}
-        </div>
-        <EventTime date={date} />
-      </div>
-      {canModify && (
-        <div className="flex justify-end space-x-4">
-          <button
-            onClick={openModifyForm}
-            className="text-blue-600 hover:underline font-medium focus:outline-none"
-          >
-            Modify
-          </button>
-          <button
-            onClick={handleDeleteClick}
-            className="text-red-600 hover:underline font-medium focus:outline-none"
-          >
-            Delete
-          </button>
-        </div>
-      )}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="w-full mb-6"
+    >
+      <div className="group">
+        <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
+          {/* Title and Actions Row */}
+          <div className="flex justify-between items-start mb-4">
+            <h2 className="text-2xl font-bold text-blue-600">{title}</h2>
+            {canModify && (
+              <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={openModifyForm}
+                  className="p-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                >
+                  <Edit2 size={16} />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleDeleteClick}
+                  className="p-2 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                >
+                  <Trash2 size={16} />
+                </motion.button>
+              </div>
+            )}
+          </div>
 
+          {/* Description */}
+          <motion.div
+            animate={{ height: isExpanded ? "auto" : "60px" }}
+            className="overflow-hidden"
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            <p className="text-gray-600 leading-relaxed">
+              {renderDescription()}
+            </p>
+          </motion.div>
+
+          {/* Expand/Collapse Button */}
+          {description.length > 100 && (
+            <button
+              onClick={toggleDescription}
+              className="mt-2 text-blue-600 font-medium flex items-center gap-1 hover:text-blue-700 focus:outline-none"
+            >
+              {isExpanded ? (
+                <>
+                  Show less <ChevronUp size={16} />
+                </>
+              ) : (
+                <>
+                  Show more <ChevronDown size={16} />
+                </>
+              )}
+            </button>
+          )}
+
+          {/* Meta Information */}
+          <div className="mt-6 flex flex-wrap gap-4 items-center text-sm">
+            <div className="flex items-center gap-2 text-gray-600">
+              <MapPin size={16} className="text-blue-500" />
+              <span>{location}</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-600">
+              <EventTime date={date} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modify Modal */}
       <AnimatePresence>
         {isModifying && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-gray-600 bg-opacity-20 overflow-y-auto h-full w-full flex justify-center items-center z-50"
-          >
-            <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              transition={{ duration: 0.2 }}
-              className="relative bg-white rounded-lg shadow-xl p-6 m-4 max-w-xl w-full"
-            >
-              <button
-                onClick={closeModifyForm}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-              >
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-              <EventModify
-                event={{ id, title, description, date, location, userId }}
-                onClose={closeModifyForm}
-                onUpdate={handleUpdate}
-                userId={currentUserId}
-                userRole={userRole}
-              />
-            </motion.div>
-          </motion.div>
+          <EventModify
+            event={{ id, title, description, date, location, userId }}
+            onClose={closeModifyForm}
+            onUpdate={handleUpdate}
+            userId={currentUserId}
+            userRole={userRole}
+          />
         )}
       </AnimatePresence>
 
+      {/* Delete Confirmation Modal */}
       <AnimatePresence>
         {showDeleteConfirmation && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center z-50"
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm overflow-y-auto h-full w-full flex justify-center items-center z-50"
           >
             <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              transition={{ duration: 0.2 }}
-              className="bg-white p-6 rounded-lg shadow-md text-center max-w-md w-full m-4"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white p-6 rounded-xl shadow-xl text-center max-w-md w-full m-4"
             >
-              <p className="text-gray-700 mb-4">
-                Are you sure you want to delete this event?
+              <h3 className="text-xl font-semibold mb-4 text-gray-900">
+                Delete Event
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to delete this event? This action cannot
+                be undone.
               </p>
-              <div className="flex justify-center space-x-4">
-                <button
+              <div className="flex justify-center gap-4">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={handleDeleteConfirm}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors duration-200"
+                  className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors"
                 >
-                  Yes, Delete
-                </button>
-                <button
+                  Delete
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => setShowDeleteConfirmation(false)}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 transition-colors duration-200"
+                  className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 transition-colors"
                 >
                   Cancel
-                </button>
+                </motion.button>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 };
 

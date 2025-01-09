@@ -17,31 +17,21 @@ export default function Page() {
   useEffect(() => {
     const isFirstVisit = checkFirstVisit();
     setShowRoadBlocking(isFirstVisit);
-    
   }, []);
 
   useEffect(() => {
-    const checkUser = () => {
-      if (user) {
-        if (
-          user.id === undefined ||
-          user.name === undefined ||
-          user.email === undefined
-        ) {
-          router.push("/dashboard/login");
-        } else {
-          setCurrentUser(user);
-        }
-      }
-    };
+    if (user === null) {
+      // User context is not yet initialized
+      return;
+    }
 
-    // Simulate a loading delay
-    const timer = setTimeout(() => {
-      checkUser();
-      setLoading(false);
-    }, 600); // Show loader for 1 second
+    if (user && user.id && user.name && user.email) {
+      setCurrentUser(user);
+    } else {
+      router.push("/dashboard/login");
+    }
 
-    return () => clearTimeout(timer);
+    setLoading(false);
   }, [user, router]);
 
   if (loading) {
