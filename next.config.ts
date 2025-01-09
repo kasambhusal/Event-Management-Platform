@@ -1,12 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  reactStrictMode: true, // Enables additional checks for hydration mismatches
   webpack(config, { isServer }) {
-    // Only apply the rule for client-side code (not server-side)
     if (!isServer) {
       config.module.rules.push({
         test: /\.html$/,
-        use: 'html-loader',
+        use: "html-loader",
       });
     }
 

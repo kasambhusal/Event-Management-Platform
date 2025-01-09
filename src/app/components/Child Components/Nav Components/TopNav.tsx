@@ -11,8 +11,8 @@ export default function TopNav() {
   };
 
   return (
-    <div className="w-full bg-white shadow-md">
-      <div className="flex justify-between items-center py-4 px-6">
+    <div className="w-full bg-white shadow-md ">
+      <div className="flex justify-between items-center  px-3 md:px-[10%]">
         {/* Logo */}
         <Link href="/">
           <Image src="/logo.jpg" width={120} height={60} alt="Logo" />
@@ -58,7 +58,7 @@ export default function TopNav() {
             Events
           </Link>
           <Link
-            href="/dashboard/contact"
+            href="#"
             className="text-gray-700 font-medium hover:text-blue-800"
           >
             Contact

@@ -76,7 +76,8 @@ function Event() {
 
   const filteredAndSortedEvents = useMemo(() => {
     const filtered = events.filter((event) =>
-      event.title.toLowerCase().includes(searchTerm.toLowerCase())
+      event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    event.location.toLowerCase().includes(searchTerm.toLowerCase()) 
     );
 
     return filtered.sort((a, b) => {
@@ -118,7 +119,7 @@ function Event() {
                 <Option value="oldest">Oldest</Option>
               </Select>
               <Input
-                placeholder="Search by title"
+                placeholder="Search by title or Location"
                 prefix={<SearchOutlined />}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{ width: 200 }}
