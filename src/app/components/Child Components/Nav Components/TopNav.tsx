@@ -12,7 +12,7 @@ export default function TopNav() {
 
   return (
     <div className="w-full bg-white shadow-md ">
-      <div className="flex justify-between items-center  px-3 md:px-[10%]">
+      <div className="flex justify-between items-center py-2  px-3 md:px-[10%]">
         {/* Logo */}
         <Link href="/">
           <Image src="/logo.jpg" width={120} height={60} alt="Logo" />
