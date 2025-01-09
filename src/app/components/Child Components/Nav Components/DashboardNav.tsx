@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useUser } from "@/app/context/UserContext";
 import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 
 function DashboardNav() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -46,7 +47,7 @@ function DashboardNav() {
 
           {/* Logout Icon with Dropdown */}
           <div className="relative">
-            <LogoutOutlined
+            <LogOut
               style={{ fontSize: "25px", color: "white", cursor: "pointer" }}
               onClick={toggleLogoutConfirm}
             />

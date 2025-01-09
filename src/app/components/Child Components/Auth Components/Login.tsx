@@ -77,6 +77,7 @@ export default function Login() {
           role: result?.data?.role || undefined,
         });
         message.success(result.message);
+        
         if (values.remember) {
           const encryptedPassword = encrypt(values.password);
           console.log("Saving to localStorage:", {

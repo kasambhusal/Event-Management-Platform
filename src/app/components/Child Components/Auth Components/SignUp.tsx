@@ -10,6 +10,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { registerUser } from "@/lib/actions/authActions";
+import { useRouter } from "next/navigation";
 
 interface FormValues {
   username: string;
@@ -17,9 +18,22 @@ interface FormValues {
   password: string;
 }
 
+// Simple XOR cipher for basic obfuscation
+const encrypt = (text: string): string => {
+  const key = "mySecretKey"; // You should use a more secure key in production
+  return text
+    .split("")
+    .map((char, index) =>
+      String.fromCharCode(
+        char.charCodeAt(0) ^ key.charCodeAt(index % key.length)
+      )
+    )
+    .join("");
+};
+
 export default function SignUp() {
   const [form] = Form.useForm();
-
+  const router = useRouter();
   const onFinish = async (values: FormValues) => {
     try {
       const result = await registerUser({
@@ -31,6 +45,16 @@ export default function SignUp() {
       if (result.success) {
         message.success(result.message);
         form.resetFields();
+        const encryptedPassword = encrypt(values.password);
+        console.log("Saving to localStorage:", {
+          email: values.email,
+          encryptedPassword,
+        }); // Log here
+        localStorage.setItem(
+          "rememberedUser",
+          JSON.stringify({ email: values.email, encryptedPassword })
+        );
+        router.push("/dashboard/login");
       } else {
         message.error(result.message);
       }
@@ -158,4 +182,3 @@ export default function SignUp() {
     </div>
   );
 }
-

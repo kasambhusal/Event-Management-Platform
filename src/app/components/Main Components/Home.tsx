@@ -12,7 +12,7 @@ function Home() {
         <p className="text-lg md:text-xl mb-6">
           Your all-in-one platform for effortless event management.
         </p>
-        <Link href="/dashboard/sign-up">
+        <Link href="/dashboard/login">
           <button className="px-8 py-3 bg-[#7ED321] text-white rounded-full text-lg font-medium hover:bg-green-600">
             Get Started
           </button>
@@ -96,7 +96,7 @@ function Home() {
         <p className="text-lg text-gray-600 mb-6">
           Sign up today and take control of your events with EventSphere.
         </p>
-        <Link href="/dashboard/sign-up">
+        <Link href="/dashboard/login">
           <button className="px-6 py-3 bg-blue-800 text-white rounded-full font-medium hover:bg-blue-700">
             Get Started Now
           </button>

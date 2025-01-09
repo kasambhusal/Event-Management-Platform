@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Form, Input, DatePicker, Button, notification } from "antd";
+import { Form, Input, Button, notification } from "antd";
 import moment from "moment";
 import { modifyEvent } from "@/lib/actions/eventActions";
 
@@ -33,7 +33,7 @@ const EventModify: React.FC<EventModifyProps> = ({
     const updatedEvent = {
       ...event,
       ...values,
-      date: values.date.toISOString(),
+      date: new Date(values.date).toISOString(), // Convert to ISO string
     };
 
     try {
@@ -75,7 +75,7 @@ const EventModify: React.FC<EventModifyProps> = ({
         layout="vertical"
         initialValues={{
           ...event,
-          date: moment(event.date),
+          date: moment(event.date).format("YYYY-MM-DDTHH:mm"), // Format for datetime-local input
         }}
         onFinish={handleSubmit}
       >
@@ -95,13 +95,19 @@ const EventModify: React.FC<EventModifyProps> = ({
         </Form.Item>
         <Form.Item
           name="date"
-          label="Date"
-          rules={[{ required: true, message: "Please select the date!" }]}
+          label="Date and Time"
+          rules={[
+            { required: true, message: "Please select the date and time!" },
+          ]}
         >
-          <DatePicker
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            showTime
-            format="YYYY-MM-DD HH:mm:ss"
+          <input
+            type="datetime-local"
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+            style={{
+              appearance: "none",
+              background: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E") no-repeat right 8px center / 16px`,
+              paddingRight: "30px",
+            }}
           />
         </Form.Item>
         <Form.Item
